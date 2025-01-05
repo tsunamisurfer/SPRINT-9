@@ -61,7 +61,7 @@ export default function AppFunctional(props) {
   async function onSubmit(evt) {
     evt.preventDefault();
     const [x, y] = getXY();
-
+  
     try {
       const response = await fetch('http://localhost:9000/api/result', {
         method: 'POST',
@@ -73,7 +73,7 @@ export default function AppFunctional(props) {
     } catch {
       setMessage('An unexpected error occurred');
     }
-
+  
     setEmail('');
   }
 

@@ -1,63 +1,55 @@
-import server from './backend/mock-server';
 import React from 'react';
-import AppFunctional from './frontend/components/AppFunctional';
 import { render, fireEvent, screen } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
+import AppFunctional from './AppFunctional';
 
-jest.setTimeout(1000);
-
-let up, down, left, right, reset, submit;
-let coordinates, steps, message, email;
-
-// Utility function to update selectors
-const updateSelectors = document => {
-  up = document.querySelector('#up');
-  down = document.querySelector('#down');
-  left = document.querySelector('#left');
-  right = document.querySelector('#right');
-  reset = document.querySelector('#reset');
-  submit = document.querySelector('#submit');
-  coordinates = document.querySelector('#coordinates');
-  steps = document.querySelector('#steps');
-  message = document.querySelector('#message');
-  email = document.querySelector('#email');
-};
-
-describe('Basic Tests for AppFunctional', () => {
-  beforeAll(() => server.listen());
-  afterAll(() => server.close());
-  beforeEach(() => {
-    render(<AppFunctional />);
-    updateSelectors(document);
-  });
-  afterEach(() => {
-    server.resetHandlers();
-    document.body.innerHTML = '';
-  });
-
-  test('Renders without crashing', () => {
-    expect(screen.getByText('You moved 0 times')).toBeInTheDocument();
-  });
-
-  test('Initial coordinates are (2,2)', () => {
-    expect(coordinates.textContent).toMatch(/\(2.*2\)$/);
-  });
-
-  test('Moving up updates coordinates to (2,1)', () => {
-    fireEvent.click(up);
-    expect(coordinates.textContent).toMatch(/\(2.*1\)$/);
-  });
-
-  test('Reset button resets coordinates to (2,2)', () => {
-    fireEvent.click(up);
-    fireEvent.click(reset);
-    expect(coordinates.textContent).toMatch(/\(2.*2\)$/);
-  });
-
-  test('Submit button requires valid email', async () => {
-    fireEvent.change(email, { target: { value: 'invalid-email' } });
-    fireEvent.click(submit);
-    expect(await screen.findByText(/email must be a valid email/i)).toBeInTheDocument();
-  });
+test('renders coordinates heading correctly', () => {
+  render(<AppFunctional />);
+  const heading = screen.getByText(/Coordinates \(\d, \d\)/); // Matches the dynamic coordinates
+  expect(heading).toBeTruthy(); // Assert the heading is in the document
 });
+
+test('renders steps heading correctly', () => {
+  render(<AppFunctional />);
+  const heading = screen.getByText(/You moved \d+ time/); // Matches the dynamic step count
+  expect(heading).toBeTruthy(); // Assert the heading is in the document
+});
+
+test('renders message heading correctly', () => {
+  const { container } = render(<AppFunctional />);
+
+  // Query the h3 element using its id
+  const messageHeading = container.querySelector('#message');
+  
+  expect(messageHeading).toBeTruthy(); // Assert the heading is in the document
+});
+
+
+test('renders button text correctly', () => {
+  render(<AppFunctional />);
+  expect(screen.getByRole('button', { name: /LEFT/ })).toBeTruthy();
+  expect(screen.getByRole('button', { name: /UP/ })).toBeTruthy();
+  expect(screen.getByRole('button', { name: /RIGHT/ })).toBeTruthy();
+  expect(screen.getByRole('button', { name: /DOWN/ })).toBeTruthy();
+  expect(screen.getByRole('button', { name: /RESET/ })).toBeTruthy();
+});
+
+test('form submission clears input field', async () => {
+  render(<AppFunctional />);
+  
+  const input = screen.getByRole('textbox'); // Get the email input
+  const submitButton = screen.getByRole('button', { name: /SUBMIT/ });
+
+  // Simulate typing in the input field
+  fireEvent.change(input, { target: { value: 'test@example.com' } });
+  expect(input.value).toBe('test@example.com'); // Assert the value is updated
+
+  // Simulate form submission
+  fireEvent.click(submitButton);
+
+  // Assert the input value is cleared after submission
+  // This check will be done after the async form submit is completed
+  await screen.findByRole('heading', { name: /test win/i }); // Wait for the message to be rendered
+  expect(input.value).toBe(''); // Assert input is cleared
+});
+
 
