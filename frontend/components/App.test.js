@@ -4,14 +4,12 @@ import AppFunctional from './AppFunctional';
 
 test('renders coordinates heading correctly', () => {
   render(<AppFunctional />);
-  const heading = screen.getByText(/Coordinates \(\d, \d\)/); // Matches the dynamic coordinates
-  expect(heading).toBeTruthy(); // Assert the heading is in the document
+  const heading = screen.getByText(/Coordinates \(\d, \d\)/); 
 });
 
 test('renders steps heading correctly', () => {
   render(<AppFunctional />);
-  const heading = screen.getByText(/You moved \d+ time/); // Matches the dynamic step count
-  expect(heading).toBeTruthy(); // Assert the heading is in the document
+  const heading = screen.getByText(/You moved \d+ time/); 
 });
 
 test('renders message heading correctly', () => {
@@ -20,7 +18,7 @@ test('renders message heading correctly', () => {
   // Query the h3 element using its id
   const messageHeading = container.querySelector('#message');
   
-  expect(messageHeading).toBeTruthy(); // Assert the heading is in the document
+  expect(messageHeading).toBeTruthy(); 
 });
 
 
