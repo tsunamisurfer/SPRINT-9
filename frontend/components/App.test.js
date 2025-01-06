@@ -34,19 +34,18 @@ test('renders button text correctly', () => {
 test('form submission clears input field', async () => {
   render(<AppFunctional />);
   
-  const input = screen.getByRole('textbox'); // Get the email input
+  const input = screen.getByRole('textbox'); 
   const submitButton = screen.getByRole('button', { name: /SUBMIT/ });
 
   // Simulate typing in the input field
   fireEvent.change(input, { target: { value: 'test@example.com' } });
-  expect(input.value).toBe('test@example.com'); // Assert the value is updated
+  expect(input.value).toBe('test@example.com'); 
 
   // Simulate form submission
   fireEvent.click(submitButton);
 
-  // Assert the input value is cleared after submission
-  // This check will be done after the async form submit is completed
-  await screen.findByRole('heading', { name: /test win/i }); // Wait for the message to be rendered
+
+  await screen.findByRole('heading', { name: /test win/i });
   expect(input.value).toBe(''); // Assert input is cleared
 });
 
