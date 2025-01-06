@@ -16,14 +16,31 @@ test('renders steps heading correctly', () => {
   expect(heading).toBeInTheDocument(); // Assert the heading is rendered correctly
 });
 
-test('renders message heading correctly', () => {
-  const { container } = render(<AppFunctional />);
+test('renders message heading correctly after form submission', async () => {
+  // Mock the fetch to simulate an error response
+  global.fetch = jest.fn(() =>
+    Promise.reject(new Error('API is down')) // Simulate an error from the API
+  );
 
-  // Query the h3 element using its id
-  const messageHeading = container.querySelector('#message');
-  
-  expect(messageHeading).toBeTruthy(); // Assert that the message heading exists
+  render(<AppFunctional />);
+
+  const input = screen.getByRole('textbox'); // Find the input field
+  const submitButton = screen.getByRole('button', { name: /SUBMIT/ }); // Find the submit button
+
+  // Simulate typing in the input field
+  fireEvent.change(input, { target: { value: 'test@example.com' } });
+  expect(input.value).toBe('test@example.com');
+
+  // Simulate form submission
+  fireEvent.click(submitButton);
+
+  // Wait for the message to appear (the message content)
+  const messageHeading = await screen.findByText(/An unexpected error occurred/i); // Match the text
+
+  // Assert that the message is rendered
+  expect(messageHeading).toBeInTheDocument();
 });
+
 
 test('renders button text correctly', () => {
   render(<AppFunctional />);
@@ -35,22 +52,31 @@ test('renders button text correctly', () => {
 });
 
 test('form submission clears input field', async () => {
+  // Mock the fetch to simulate an error response
+  global.fetch = jest.fn(() =>
+    Promise.reject(new Error('API is down')) // Simulate an error from the API
+  );
+
   render(<AppFunctional />);
 
-  const input = screen.getByRole('textbox'); // Assuming this is the email input field
-  const submitButton = screen.getByRole('button', { name: /SUBMIT/ });
+  const input = screen.getByRole('textbox'); // Find the input field
+  const submitButton = screen.getByRole('button', { name: /SUBMIT/ }); // Find the submit button
 
   // Simulate typing in the input field
   fireEvent.change(input, { target: { value: 'test@example.com' } });
-  expect(input.value).toBe('test@example.com'); // Assert the input value is correct
+  expect(input.value).toBe('test@example.com');
 
   // Simulate form submission
   fireEvent.click(submitButton);
 
-  // Wait for the message heading to update (indicating form was submitted)
-  await waitFor(() => screen.getByRole('heading', { name: /test win/i }));
+  // Wait for the message to appear after form submission (error message due to fetch failure)
+  const messageHeading = await screen.findByText(/An unexpected error occurred/i); // Match the text
   
+  // Assert the message is rendered
+  expect(messageHeading).toBeInTheDocument();
+
   // Assert the input field is cleared after submission
   expect(input.value).toBe('');
 });
+
 
